@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verificador de Cobertura - Culligan</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="map"></div>
+
+  <header>
+    <img src="https://culligan.com.br/wp-content/uploads/2024/11/logomarca-culligan.png" alt="Logo Culligan" class="logo" />
+    <h2>Área de atendimento Técnico</h2>
+    <p>Digite um CEP para saber se ele está dentro de um raio de atendimento.</p>
+    <div class="resultado" id="resultado"></div>
+  </header>
+
+  <div class="busca">
+    <input type="text" id="cep" placeholder="Digite o CEP" />
+    <button onclick="verificarDistancia()">Verificar Cobertura</button>
+  </div>
+
+  <div class="ver-todos">
+    <button onclick="verTodosPontos()">Ver todos os pontos disponíveis</button>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
