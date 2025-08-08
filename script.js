@@ -1,4 +1,3 @@
-
 const pontos = [
   { nome: "DAZU PURIFICADORES", cep: "60040-000" },
   { nome: "PADIZON REFRIGERAÇÃO", cep: "58030-000" },
@@ -18,12 +17,6 @@ const pontos = [
   { nome: "START REFRIGERAÇÃO", cep: "29150-240" }
 ];
 
-const estadosComAtendimento = [
-  "Ceará", "Paraíba", "Tocantins", "Minas Gerais", "São Paulo",
-  "Bahia", "Paraná", "Santa Catarina", "Alagoas", "Distrito Federal",
-  "Rondônia", "Rio de Janeiro", "Sergipe", "Espírito Santo"
-];
-
 const map = L.map('map', {
   zoomControl: true,
   minZoom: 4,
@@ -41,12 +34,8 @@ fetch('https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/p
   .then(res => res.json())
   .then(data => {
     L.geoJSON(data, {
-      style: feature => ({
-        color: "#004080",
-        weight: 1,
-      }),
+      style: () => ({ color: "#004080", weight: 1 }),
       onEachFeature: (feature, layer) => {
-        const nomeEstado = feature.properties.name;
         const siglas = {
           "Acre": "AC", "Alagoas": "AL", "Amapá": "AP", "Amazonas": "AM", "Bahia": "BA",
           "Ceará": "CE", "Distrito Federal": "DF", "Espírito Santo": "ES", "Goiás": "GO",
@@ -56,16 +45,12 @@ fetch('https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/p
           "Rondônia": "RO", "Roraima": "RR", "Santa Catarina": "SC", "São Paulo": "SP",
           "Sergipe": "SE", "Tocantins": "TO"
         };
+        const nomeEstado = feature.properties.name;
         const sigla = siglas[nomeEstado] || nomeEstado;
-
         layer.bindPopup(nomeEstado);
-
         const centro = layer.getBounds().getCenter();
-        const label = L.tooltip({
-          permanent: true,
-          direction: "center",
-          className: "estado-label"
-        }).setContent(sigla).setLatLng(centro);
+        const label = L.tooltip({ permanent: true, direction: "center", className: "estado-label" })
+          .setContent(sigla).setLatLng(centro);
         map.addLayer(label);
       }
     }).addTo(map);
@@ -79,10 +64,7 @@ async function getLatLng(cep) {
     const geoResp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(endereco)}`);
     const geoData = await geoResp.json();
     if (geoData.length > 0) {
-      return {
-        lat: parseFloat(geoData[0].lat),
-        lng: parseFloat(geoData[0].lon)
-      };
+      return { lat: +geoData[0].lat, lng: +geoData[0].lon };
     }
   }
   return null;
@@ -91,20 +73,16 @@ async function getLatLng(cep) {
 async function verificarDistancia() {
   const cep = document.getElementById('cep').value.replace(/\D/g, '');
   if (!cep) return;
-
   const userLocation = await getLatLng(cep);
   if (!userLocation) {
     document.getElementById('resultado').innerText = 'CEP inválido ou não encontrado';
     return;
   }
-
   let encontrado = false;
   for (const ponto of pontos) {
     const pontoLatLng = await getLatLng(ponto.cep);
     if (!pontoLatLng) continue;
-
     const distance = map.distance(userLocation, pontoLatLng) / 1000;
-
     if (distance <= 70) {
       document.getElementById('resultado').innerText = `Cobertura disponível: ${ponto.nome} está a ${distance.toFixed(2)} km.`;
       L.circle(userLocation, { radius: 70000, color: "blue", fillOpacity: 0.1 }).addTo(map);
@@ -115,7 +93,6 @@ async function verificarDistancia() {
       break;
     }
   }
-
   if (!encontrado) {
     document.getElementById('resultado').innerText = 'Nenhum ponto de atendimento encontrado em até 70 km.';
   }
@@ -127,11 +104,7 @@ async function verTodosPontos() {
     const pontoLatLng = await getLatLng(ponto.cep);
     if (pontoLatLng) {
       L.marker(pontoLatLng).addTo(map).bindPopup(ponto.nome);
-      L.circle(pontoLatLng, {
-        radius: 70000,
-        color: 'blue',
-        fillOpacity: 0.1
-      }).addTo(map);
+      L.circle(pontoLatLng, { radius: 70000, color: 'blue', fillOpacity: 0.1 }).addTo(map);
     }
   }
 }
