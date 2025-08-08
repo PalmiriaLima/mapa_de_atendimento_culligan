@@ -1,31 +1,13 @@
-
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-}
-
-.estado-label {
-  background: rgba(255, 255, 255, 0.7);
-  border-radius: 4px;
-  padding: 2px 4px;
-  font-size: 12px;
-  color: #003366;
-  font-weight: bold;
-  border: 1px solid #ccc;
-  text-align: center;
-}
-
-body {
   font-family: Arial, sans-serif;
 }
 
 #map {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
+  inset: 0; /* substitui top, bottom, left, right */
   z-index: 0;
 }
 
@@ -51,6 +33,17 @@ header h2, header p {
   text-shadow: 0 0 5px #fff;
 }
 
+.estado-label {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 4px;
+  padding: 2px 4px;
+  font-size: 12px;
+  color: #003366;
+  font-weight: bold;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
 .busca {
   position: absolute;
   top: 20px;
@@ -60,9 +53,11 @@ header h2, header p {
   z-index: 1001;
 }
 
-.busca input, .busca button {
+.busca input, .busca button,
+.ver-todos button {
   padding: 5px 10px;
   font-size: 14px;
+  cursor: pointer;
 }
 
 .ver-todos {
@@ -71,12 +66,6 @@ header h2, header p {
   width: 100%;
   text-align: center;
   z-index: 1000;
-}
-
-.ver-todos button {
-  padding: 10px 15px;
-  font-size: 14px;
-  cursor: pointer;
 }
 
 .resultado {
