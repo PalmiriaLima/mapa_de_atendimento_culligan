@@ -6,27 +6,18 @@
   <title>Verificador de Cobertura - Culligan</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css" />
   <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
 </head>
 <body>
   <div id="map"></div>
 
   <header>
-    <img src="https://culligan.com.br/wp-content/uploads/2024/11/logomarca-culligan.png" alt="Logo Culligan" class="logo" loading="lazy" />
-    <h2>Área de atendimento Técnico</h2>
-    <p>Digite um CEP para saber se ele está dentro de um raio de atendimento.</p>
-    <div class="resultado" id="resultado"></div>
+    <img src="https://culligan.com.br/wp-content/uploads/2024/11/logomarca-culligan.png" alt="Logo Culligan">
+    <h1>Verificador de Cobertura</h1>
+    <input type="text" id="cep" placeholder="Digite o CEP">
+    <button onclick="verificarDistancia()">Verificar</button>
+    <button onclick="verTodosPontos()">Ver Todos os Pontos</button>
+    <p id="resultado"></p>
   </header>
-
-  <div class="busca">
-    <input type="text" id="cep" placeholder="Digite o CEP" />
-    <button onclick="verificarDistancia()">Verificar Cobertura</button>
-  </div>
-
-  <div class="ver-todos">
-    <button onclick="verTodosPontos()">Ver todos os pontos disponíveis</button>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js" defer></script>
-  <script src="script.js" defer></script>
 </body>
 </html>
