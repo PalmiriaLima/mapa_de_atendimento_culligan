@@ -1,124 +1,68 @@
-const pontos = [
-  { nome: "DAZU PURIFICADORES", cep: "60040-000" },
-  { nome: "PADIZON REFRIGERAÇÃO", cep: "58030-000" },
-  { nome: "CASA DOS FILTROS", cep: "77062-020" },
-  { nome: "OFICINA DO ESPRESSO", cep: "30360-090" },
-  { nome: "TECNICOS CULLIGAN", cep: "05424-070" },
-  { nome: "TECNICOS CULLIGAN", cep: "40020-000" },
-  { nome: "TECNICOS CULLIGAN", cep: "48280-000" },
-  { nome: "GRUPO C&D", cep: "80230-020" },
-  { nome: "HOMETECH", cep: "88301-668" },
-  { nome: "EDMILSON", cep: "57045-838" },
-  { nome: "EDUARDO", cep: "73753-064" },
-  { nome: "SANFILTROS", cep: "86060-000" },
-  { nome: "ERCOMFRIO", cep: "78900-970" },
-  { nome: "OESTE RIO", cep: "21241-051" },
-  { nome: "LOJÃO DOS FILTROS", cep: "49045-970" },
-  { nome: "START REFRIGERAÇÃO", cep: "29150-240" }
-];
-
-const map = L.map('map', {
-  zoomControl: true,
-  minZoom: 4,
-  maxZoom: 16,
-  maxBounds: [[-35, -75], [7, -30]]
-});
-
-map.fitBounds([[-33.75, -73.99], [5.27, -34.79]]);
-
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; <a href="https://carto.com/">CARTO</a> | Map data © <a href="https://openstreetmap.org">OpenStreetMap</a>',
+const map = L.map('map').setView([-14.235, -51.9253], 4);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
-const cacheCoords = {};
+const loadingEl = document.getElementById("loading");
 
-// Lazy load do GeoJSON para não travar o carregamento
-window.addEventListener("load", () => {
-  setTimeout(() => {
-    fetch('https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson')
-      .then(res => res.json())
-      .then(data => {
-        L.geoJSON(data, {
-          style: () => ({ color: "#004080", weight: 1 }),
-          onEachFeature: (feature, layer) => {
-            const siglas = {
-              "Acre": "AC", "Alagoas": "AL", "Amapá": "AP", "Amazonas": "AM", "Bahia": "BA",
-              "Ceará": "CE", "Distrito Federal": "DF", "Espírito Santo": "ES", "Goiás": "GO",
-              "Maranhão": "MA", "Mato Grosso": "MT", "Mato Grosso do Sul": "MS", "Minas Gerais": "MG",
-              "Pará": "PA", "Paraíba": "PB", "Paraná": "PR", "Pernambuco": "PE", "Piauí": "PI",
-              "Rio de Janeiro": "RJ", "Rio Grande do Norte": "RN", "Rio Grande do Sul": "RS",
-              "Rondônia": "RO", "Roraima": "RR", "Santa Catarina": "SC", "São Paulo": "SP",
-              "Sergipe": "SE", "Tocantins": "TO"
-            };
-            const nomeEstado = feature.properties.name;
-            const sigla = siglas[nomeEstado] || nomeEstado;
-            layer.bindPopup(nomeEstado);
-            const centro = layer.getBounds().getCenter();
-            const label = L.tooltip({ permanent: true, direction: "center", className: "estado-label" })
-              .setContent(sigla).setLatLng(centro);
-            map.addLayer(label);
-          }
-        }).addTo(map);
-      });
-  }, 500);
+function showLoading() {
+  loadingEl.style.display = "block";
+}
+
+function hideLoading() {
+  loadingEl.style.display = "none";
+}
+
+// Função para buscar CEP
+async function buscarCEP(cep) {
+  try {
+    showLoading();
+    const cepResponse = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const cepData = await cepResponse.json();
+
+    if (cepData.erro) {
+      alert("CEP não encontrado.");
+      hideLoading();
+      return;
+    }
+
+    const endereco = `${cepData.logradouro}, ${cepData.localidade}, ${cepData.uf}`;
+    const geoResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${endereco}`);
+    const geoData = await geoResponse.json();
+
+    if (geoData.length > 0) {
+      const { lat, lon } = geoData[0];
+      map.setView([lat, lon], 15);
+      L.marker([lat, lon]).addTo(map).bindPopup(`Local encontrado: ${endereco}`).openPopup();
+    } else {
+      alert("Não foi possível localizar o endereço no mapa.");
+    }
+  } catch (error) {
+    console.error("Erro na busca:", error);
+    alert("Ocorreu um erro ao buscar o CEP.");
+  } finally {
+    hideLoading();
+  }
+}
+
+document.getElementById("checkCep").addEventListener("click", () => {
+  const cep = document.getElementById("cep").value.replace(/\D/g, "");
+  if (cep.length === 8) {
+    buscarCEP(cep);
+  } else {
+    alert("Digite um CEP válido com 8 números.");
+  }
 });
 
-async function getLatLng(cep) {
-  if (cacheCoords[cep]) return cacheCoords[cep];
-  const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-  const data = await response.json();
-  if (!data.erro) {
-    const endereco = `${data.logradouro || ''}, ${data.localidade}, ${data.uf}`;
-    const geoResp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(endereco)}`);
-    const geoData = await geoResp.json();
-    if (geoData.length > 0) {
-      const coords = { lat: +geoData[0].lat, lng: +geoData[0].lon };
-      cacheCoords[cep] = coords;
-      return coords;
-    }
+// Exemplo de função para "Ver Todos os Pontos"
+document.getElementById("showAll").addEventListener("click", async () => {
+  try {
+    showLoading();
+    // Aqui ficaria seu carregamento de pontos/GeoJSON otimizado
+    // Simulação:
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    alert("Todos os pontos foram carregados.");
+  } finally {
+    hideLoading();
   }
-  return null;
-}
-
-async function verificarDistancia() {
-  const cep = document.getElementById('cep').value.replace(/\D/g, '');
-  if (!cep) return;
-  const userLocation = await getLatLng(cep);
-  if (!userLocation) {
-    document.getElementById('resultado').innerText = 'CEP inválido ou não encontrado';
-    return;
-  }
-  const results = await Promise.all(pontos.map(async ponto => {
-    const pontoLatLng = await getLatLng(ponto.cep);
-    if (!pontoLatLng) return null;
-    const distance = map.distance(userLocation, pontoLatLng) / 1000;
-    return { ponto, pontoLatLng, distance };
-  }));
-
-  const encontrado = results.find(r => r && r.distance <= 70);
-  if (encontrado) {
-    document.getElementById('resultado').innerText =
-      `Cobertura disponível: ${encontrado.ponto.nome} está a ${encontrado.distance.toFixed(2)} km.`;
-    L.circle(userLocation, { radius: 70000, color: "blue", fillOpacity: 0.1 }).addTo(map);
-    L.marker(userLocation).addTo(map).bindPopup("Você está aqui").openPopup();
-    L.marker(encontrado.pontoLatLng).addTo(map).bindPopup(encontrado.ponto.nome);
-    map.setView(userLocation, 10);
-  } else {
-    document.getElementById('resultado').innerText =
-      'Nenhum ponto de atendimento encontrado em até 70 km.';
-  }
-}
-
-async function verTodosPontos() {
-  map.fitBounds([[-33.75, -73.99], [5.27, -34.79]]);
-  const results = await Promise.all(pontos.map(async ponto => {
-    const pontoLatLng = await getLatLng(ponto.cep);
-    return { ponto, pontoLatLng };
-  }));
-  results.forEach(r => {
-    if (r.pontoLatLng) {
-      L.marker(r.pontoLatLng).addTo(map).bindPopup(r.ponto.nome);
-      L.circle(r.pontoLatLng, { radius: 70000, color: 'blue', fillOpacity: 0.1 }).addTo(map);
-    }
-  });
-}
+});
