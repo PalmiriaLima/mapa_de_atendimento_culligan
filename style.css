@@ -1,75 +1,27 @@
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: Arial, sans-serif;
-}
-
 #map {
-  position: absolute;
-  inset: 0; /* substitui top, bottom, left, right */
-  z-index: 0;
+  height: 100vh;
+  width: 100%;
 }
 
 header {
   position: absolute;
-  top: 0;
-  width: 100%;
-  text-align: center;
-  padding: 20px;
-  background-color: transparent;
-  color: #000;
+  top: 10px;
+  left: 10px;
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0px 2px 8px rgba(0,0,0,0.2);
   z-index: 1000;
 }
 
-header img {
-  height: 80px;
-  margin-bottom: 10px;
-}
-
-header h2, header p {
+header input, header button {
+  padding: 6px;
   margin: 5px 0;
-  color: #000;
-  text-shadow: 0 0 5px #fff;
 }
 
 .estado-label {
   background: rgba(255, 255, 255, 0.7);
-  border-radius: 4px;
-  padding: 2px 4px;
+  border: none;
+  font-weight: bold;
   font-size: 12px;
-  color: #003366;
-  font-weight: bold;
-  border: 1px solid #ccc;
-  text-align: center;
-}
-
-.busca {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  display: flex;
-  gap: 10px;
-  z-index: 1001;
-}
-
-.busca input, .busca button,
-.ver-todos button {
-  padding: 5px 10px;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.ver-todos {
-  position: absolute;
-  bottom: 20px;
-  width: 100%;
-  text-align: center;
-  z-index: 1000;
-}
-
-.resultado {
-  margin-top: 10px;
-  font-weight: bold;
-  text-shadow: 0 0 5px #fff;
 }
