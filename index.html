@@ -4,20 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Verificador de Cobertura - Culligan</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="style.css" />
-  <script src="script.js" defer></script>
 </head>
 <body>
-  <div id="map"></div>
-
-  <header>
-    <img src="https://culligan.com.br/wp-content/uploads/2024/11/logomarca-culligan.png" alt="Logo Culligan">
+  <div id="app">
     <h1>Verificador de Cobertura</h1>
-    <input type="text" id="cep" placeholder="Digite o CEP">
-    <button onclick="verificarDistancia()">Verificar</button>
-    <button onclick="verTodosPontos()">Ver Todos os Pontos</button>
-    <p id="resultado"></p>
-  </header>
+    <input type="text" id="cep" placeholder="Digite o CEP" />
+    <button id="checkCep">Verificar</button>
+    <button id="showAll">Ver Todos os Pontos</button>
+
+    <!-- Loader invisível por padrão -->
+    <div id="loading">⏳ Carregando dados, aguarde...</div>
+
+    <div id="map"></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
